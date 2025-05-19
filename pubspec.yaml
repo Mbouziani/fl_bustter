@@ -1,6 +1,6 @@
 name: fl_bustter
 description: A flexible CQRS-style message bus and validation package for Dart & Flutter.
-version: 1.0.0
+version: 1.0.1
 
 homepage: https://github.com/Mbouziani/fl_bustter
 repository: https://github.com/Mbouziani/fl_bustter

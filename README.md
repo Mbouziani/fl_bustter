@@ -17,7 +17,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fl_bustter: ^1.0.0
+  fl_bustter: ^1.0.1
 ```
 
 Then run:
