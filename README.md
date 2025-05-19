@@ -1,39 +1,145 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# fl_bustter
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages). 
+A lightweight Dart command bus and validation framework inspired by CQRS (Command Query Responsibility Segregation) patterns. Designed for clean, testable, and scalable architecture in Dart or Flutter applications.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages). 
--->
+## ✨ Features
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+- 📨 `Busster`: A simple request/handler dispatcher.
+- ✅ `IValidator`: Built-in validation system with rules like `notEmpty`, `emailAddress`, `mustMatch`, `isIn`, and `nested`.
+- 📦 Easy integration with custom request types and handlers.
+- 🧪 Fully testable.
 
-## Features
+---
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+## 📦 Installation
 
-## Getting started
+Add this to your `pubspec.yaml`:
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
-```dart
-const like = 'sample';
+```yaml
+dependencies:
+  fl_bustter: ^0.0.1
 ```
 
-## Additional information
+Then run:
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```bash
+dart pub get
+```
+
+## 📦 Getting Started
+
+### 1. Create a Response
+
+```dart
+class LoginResponse {
+  final String token;
+  LoginResponse(this.token);
+}
+```
+
+### 2. Create a Request
+
+```dart
+class LoginRequest extends IRequest<LoginResponse> {
+  final String email;
+  final String password;
+
+  LoginRequest({required this.email, required this.password});
+}
+```
+
+### 3. Create a Validator
+
+```dart
+class LoginValidator extends IValidator<LoginRequest> {
+  @override
+  void buildRules() {
+    ruleFor((x) => x.email, 'email')
+        .notEmpty()
+        .emailAddress()
+        .withMessage('Please enter a valid email');
+
+    ruleFor((x) => x.password, 'password')
+        .notEmpty()
+        .minLength(6)
+        .withMessage('Password must be at least 6 characters');
+  }
+}
+```
+
+### 4. Create a Request
+
+```dart
+class LoginRequest extends IRequest<String> {
+  final String email;
+  final String password;
+
+  LoginRequest({required this.email, required this.password});
+}
+```
+
+### 5. Create a Handler
+
+```dart
+class LoginHandler extends IHandler<LoginRequest, LoginResponse> {
+  LoginHandler() : super(LoginValidator());
+
+  @override
+  Future<LoginResponse> handle(LoginRequest request) async {
+    await Future.delayed(Duration(seconds: 5));
+
+    // Simulate login logic
+    if (request.email == 'test@example.com' &&
+        request.password == 'password123') {
+      return LoginResponse("token_string_example");
+    } else {
+      throw Exception('Invalid email or password');
+    }
+  }
+}
+```
+
+### 5. Register in Busster
+
+```dart
+void main()  {
+  final busster = Busster();
+
+  // Register the handler
+  busster.registerHandler<LoginRequest, LoginResponse>(LoginHandler());
+}
+```
+
+### 6. Use Busster
+
+```dart
+void call() async {
+   
+  try {
+    final request = LoginRequest(email: 'test@example.com', password: 'password123');
+    final result = await busster.send<LoginResponse>(request);
+    print(result.token); // Login successful: token_string_example
+  } on ValidationException catch (e) {
+    print('Validation failed:');
+    print(e.toString());
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+```
+
+## 📁 Example
+
+See [`example/fl_bustter_example.dart`](example/fl_bustter_example.dart) for a working login use case.
+
+## 🧪 Tests
+
+Run tests using:
+
+```bash
+dart test
+```
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
