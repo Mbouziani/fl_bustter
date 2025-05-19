@@ -130,7 +130,7 @@ void call() async {
 
 ## 📁 Example
 
-See [`example/fl_bustter_example.dart`](example/fl_bustter_example.dart) for a working login use case.
+See [`example/main.dart`](example/main.dart) for a working login use case.
 
 ## 🧪 Tests
 
